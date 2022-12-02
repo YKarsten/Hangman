@@ -1,8 +1,8 @@
 txt = File.read('google-10000-english-no-swears.txt').split("\n")
 
 # Methods
-def repeat(n)
-  print '_ ' * n
+def repeat(word_length)
+  print '_ ' * word_length
   puts "\n\n"
 end
 
@@ -10,9 +10,7 @@ def secret(string)
   secret_words = Array.new(0)
 
   string.each_with_index do |word, index|
-    if word.length>4 && word.length < 13
-      secret_words[index] = word
-    end
+    secret_words[index] = word if word.length > 4 && word.length < 13
   end
   secret_words.reject! { |c| c.nil? || c&.empty? }
   secret_words.sample.split('').join(' ')
@@ -23,9 +21,10 @@ def make_guess(secret_word, user_in)
 
   return secret_word.gsub(/#{reg_exp}/, '_')
 
-  if secret_word.include?(user_in)
+  unless secret_word.include?(user_in)
   else
-    puts "\n#{user_in} is not in the secret word."
+    puts "\n#{user_in} is not part of the secret word."
+    user_in
   end
 end
 
@@ -41,7 +40,7 @@ end
 
 # Variables
 secret_word = secret(txt)
-wrong_guess= " " # Keeping count of wrong inputs doesnt work yet
+wrong_guess = '' # Keeping count of wrong inputs doesnt work yet
 count = 0
 player_guesses = ''
 
@@ -51,10 +50,12 @@ puts secret_word
 repeat(secret_word.length)
 
 # Game flow
-while count <= 10 # not ideal
+while count <= secret_word.length + 5 # not ideal
 
   # User input
-  puts "\nHangman. Make a guess"
+  puts "\nHangman. Make a guess.
+  Letters you guessed so far: #{player_guesses}.
+  But these are not part of the secret word: #{wrong_guess}"
   user_in = gets.chomp.downcase
 
   unless user_in.length == 1
@@ -63,13 +64,15 @@ while count <= 10 # not ideal
   end
   player_guesses << user_in
 
-  attempt = make_guess(secret_word, player_guesses)
-  puts attempt
+  attempt = make_guess(secret_word, player_guesses) # this either returns a long string or a single user input
 
+  wrong_guess << user_in if secret_word.include?(user_in) == false
+
+  puts attempt
   count += 1
 
   # Won
-  if count == 11
+  if count == secret_word.length + 5 + 1
     game_lost(secret_word)
     break
   end
