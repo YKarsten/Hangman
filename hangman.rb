@@ -40,17 +40,18 @@ end
 
 # Variables
 secret_word = secret(txt)
-wrong_guess = '' # Keeping count of wrong inputs doesnt work yet
-count = 0
+wrong_guess = ''
 player_guesses = ''
+count = 0
 
 # Game set up
-puts "The game starts. blablabla \n\n"
-puts secret_word
+puts "***Hangman console game***
+In this game of hangman you need to guess a secret word by entering single letters to the console. \n"
+# puts secret_word
 repeat(secret_word.length)
 
 # Game flow
-while count <= secret_word.length + 5 # not ideal
+while count <= secret_word.length + 5
 
   # User input
   puts "\nHangman. Make a guess.
@@ -62,9 +63,10 @@ while count <= secret_word.length + 5 # not ideal
     puts 'Only enter a single letter'
     user_in = gets.chomp
   end
+
   player_guesses << user_in
 
-  attempt = make_guess(secret_word, player_guesses) # this either returns a long string or a single user input
+  attempt = make_guess(secret_word, player_guesses)
 
   wrong_guess << user_in if secret_word.include?(user_in) == false
 
