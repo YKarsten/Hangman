@@ -1,4 +1,5 @@
-# Comment
+require 'yaml'
+
 class Hangman
   attr_accessor :secret_word, :count, :player_guesses, :wrong_guess
 
@@ -47,14 +48,36 @@ class Hangman
     puts "\nCongrats you won this game of hangman!
     It only took you #{count} tries to get to the secret word."
   end
-end
 
-# Init Hangman class instance
-game = Hangman.new
+  def to_yaml
+    YAML.dump ({
+      secret_word: secret_word,
+      count: count,
+      player_guesses: player_guesses,
+      wrong_guess: wrong_guess
+    })
+  end
+
+  def self.from_yaml(string)
+    data = YAML.safe_load string
+    p data
+    # new(data[:secret_word], data[:count], data[:player_guesses], data[:wrong_guess])
+  end
+end
 
 # Game set up
 puts "***Hangman console game***
 In this game of hangman you need to guess a secret word by entering single letters to the console. \n"
+
+puts 'Do you want to load the last session? (y/n)'
+
+p_load = gets.chomp
+p_load.downcase!
+if p_load == 'y'
+  game = Hangman.from_yaml('hangman_save.yml')
+else
+  game = Hangman.new
+end
 
 secret_word = game.secret_word
 game.repeat(secret_word.length)
@@ -69,6 +92,8 @@ while game.count <= secret_word.length + 5
     p_save.downcase!
     if p_save == 'y'
       # serialize this file
+      File.open('hangman_save.yml', 'w') { |file| file.write(game.to_yaml) }
+      break
     end
   end
 
