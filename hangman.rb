@@ -1,5 +1,8 @@
+# frozen_string_literal: true
+
 require 'yaml'
 
+# A console based game of Hangman in which the user needs to input single letters to guess a randomly chosen word
 class Hangman
   attr_accessor :secret_word, :count, :player_guesses, :wrong_guess
 
@@ -50,7 +53,7 @@ class Hangman
   end
 
   def to_yaml
-    YAML.dump ({
+    YAML.dump({
       secret_word: secret_word,
       count: count,
       player_guesses: player_guesses,
@@ -58,10 +61,13 @@ class Hangman
     })
   end
 
-  def self.from_yaml(string)
-    data = YAML.safe_load string
-    p data
-    # new(data[:secret_word], data[:count], data[:player_guesses], data[:wrong_guess])
+  def from_yaml(string)
+    data = YAML.load_file(string)
+    puts data.inspect
+    @secret_word = data[:secret_word]
+    @count = data[:count]
+    @player_guesses = data[:player_guesses]
+    @wrong_guess = data[:wrong_guess]
   end
 end
 
@@ -69,20 +75,21 @@ end
 puts "***Hangman console game***
 In this game of hangman you need to guess a secret word by entering single letters to the console. \n"
 
+game = Hangman.new
+secret_word = game.secret_word
+
+# Ask to load the previous session and override the important instance variables
 puts 'Do you want to load the last session? (y/n)'
 
 p_load = gets.chomp
 p_load.downcase!
 if p_load == 'y'
-  game = Hangman.from_yaml('hangman_save.yml')
-else
-  game = Hangman.new
+  game.from_yaml('hangman_save.yml')
+  game.make_guess(game.secret_word, game.player_guesses)
 end
 
-secret_word = game.secret_word
-game.repeat(secret_word.length)
-
 # Game flow
+game.repeat(secret_word.length)
 while game.count <= secret_word.length + 5
 
   # Give a chance to save game
